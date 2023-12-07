@@ -3,7 +3,7 @@
 # Example using a range of numbers
 while true
 do
-	make re && ./automatas
-	sleep 2
+	make && ./automatas
+	sleep 1
 	clear
 done

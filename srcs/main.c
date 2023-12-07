@@ -6,7 +6,7 @@
 /*   By: psegura- <psegura-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/02 20:04:21 by psegura-          #+#    #+#             */
-/*   Updated: 2023/12/07 01:28:00 by psegura-         ###   ########.fr       */
+/*   Updated: 2023/12/07 21:20:20 by psegura-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,23 +14,23 @@
 
 const char *s_states[] =
 {
-	"Empty",
+	"INIT",
 	"Error",
 	"Test 0",
 	"Test 1",
 	NULL
 };
 
-const char *dic = "-01";
+const char *dic = " 01";
 
 int	get_state(int x, int y)
 {
 	const int	states[][4] = {
-//   *  0  1 \0  
-	{1, 2, 3, 1}, //Empty
-	{1, 2, 2, 1}, //Error
-	{1, 2, 2, 1}, //0
-	{1, 2, 3, 1}  //1
+//   *  0  1 
+	{1, 2, 3}, //0 INIT
+	{1, 1, 1}, //1 ERR
+	{1, 2, 3}, //2 '0'
+	{1, 2, 3}  //3 '1'
 	};
 	printf("X: [%d] Y: [%d] -> State: [%d] [%s]\n", x, y, states[x][y], s_states[x]);
 	return (states[x][y]);
@@ -41,7 +41,7 @@ int	get_index(char c)
 	int i = 0;
 
 	if (ft_isalpha(c))
-		return (3);
+		return (0);
 
 	while (dic[i])
 	{
@@ -52,36 +52,39 @@ int	get_index(char c)
 	return (0);
 }
 
-int get_number(char c)
+int	choose_state(int state, char c)
 {
-	if (ft_isdigit(c))
-		return (c - '0');
-	return (0);
+	int pos = 0;
+
+	if (c == '0')
+		pos = 1;
+	else if (c == '1')
+		pos = 2;
+	return (get_state(state, pos));
 }
 
 int	evaluate(char *str)
 {
 	int i = 0;
-	int	res = 0;
+	int	state = 0;
 
 	while (str[i])
 	{
 		printf("%c -> ", str[i]);
-		res = get_state(get_index(str[i]), get_number(str[i]));
-		// printf("state: [%d]\n", res);
+		state = choose_state(state, str[i]);
 		i++;
 	}
-	if (res < 2)
+	if (state < 2)
 	{
-		printf("Error with state: [%d]\n", res);
-		return (res);
+		printf("Error with state: [%d]\n", state);
+		return (state);
 	}
-	return (res);
+	return (state);
 }
 
 int	main(void)
 {
-	char	*str = "1aa0001";
+	char	*str = "100011001010";
 	int		state = evaluate(str);
 
 	printf("Input: [%s]\n", str);
