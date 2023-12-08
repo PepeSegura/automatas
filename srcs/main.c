@@ -6,7 +6,7 @@
 /*   By: psegura- <psegura-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/02 20:04:21 by psegura-          #+#    #+#             */
-/*   Updated: 2023/12/07 21:20:20 by psegura-         ###   ########.fr       */
+/*   Updated: 2023/12/08 02:35:56 by psegura-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,61 +16,47 @@ const char *s_states[] =
 {
 	"INIT",
 	"Error",
-	"Test 0",
-	"Test 1",
+	"Found Space",
+	"Found Symbol",
+	"Found Digit",
 	NULL
 };
-
-const char *dic = " 01";
 
 int	get_state(int x, int y)
 {
 	const int	states[][4] = {
-//   *  0  1 
-	{1, 2, 3}, //0 INIT
-	{1, 1, 1}, //1 ERR
-	{1, 2, 3}, //2 '0'
-	{1, 2, 3}  //3 '1'
+//   *  S  +- D
+	{1, 2, 3, 4},	//0 INIT
+	{1, 1, 1, 1},	//1 ERR
+	{1, 2, 3, 4},	//2 Found Space
+	{1, 1, 1, 4}, 	//3 Found Symbol
+	{1, 2, 1, 4},	//4 Found Digit
 	};
-	printf("X: [%d] Y: [%d] -> State: [%d] [%s]\n", x, y, states[x][y], s_states[x]);
 	return (states[x][y]);
-}
-
-int	get_index(char c)
-{
-	int i = 0;
-
-	if (ft_isalpha(c))
-		return (0);
-
-	while (dic[i])
-	{
-		if (dic[i] == c)
-			return (i);
-		i++;
-	}
-	return (0);
 }
 
 int	choose_state(int state, char c)
 {
 	int pos = 0;
-
-	if (c == '0')
+	int prev = state;
+	if (c == ' ')
 		pos = 1;
-	else if (c == '1')
+	else if (c == '-' || c == '+')
 		pos = 2;
-	return (get_state(state, pos));
+	else if (ft_isdigit(c))
+		pos = 3;
+	state = get_state(state, pos);
+	printf("[%c] -> X: [%d] Y: [%d] -> State: [%d] [%s]\n", c, prev, pos, state, s_states[state]);
+	return (state);
 }
 
-int	evaluate(char *str)
+int	evaluate(const char *str)
 {
 	int i = 0;
 	int	state = 0;
 
 	while (str[i])
 	{
-		printf("%c -> ", str[i]);
 		state = choose_state(state, str[i]);
 		i++;
 	}
@@ -82,11 +68,31 @@ int	evaluate(char *str)
 	return (state);
 }
 
+const char *tests[] =
+{
+	"1231231",
+	"123 123",
+	" 123",
+	"123 ",
+	" 123 ",
+	" -123 +123 123 ",
+	"--123",
+	"123a",
+	"-123a",
+	" - 1",
+	"1 - ",
+	"",
+	NULL
+};
+
 int	main(void)
 {
-	char	*str = "100011001010";
-	int		state = evaluate(str);
+	for (int i = 0; tests[i]; i++)
+	{
+		printf("Input: [%s]\n", tests[i]);
+		int	state = evaluate(tests[i]);
 
-	printf("Input: [%s]\n", str);
-	printf("State: [%d] -> [%s]\n", state, s_states[state]);
+		printf("State: [%d] -> [%s]\n\n", state, s_states[state]);	
+	}
+	return (0);
 }
